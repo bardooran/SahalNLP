@@ -9,8 +9,5 @@ build/
 .coverage
 htmlcov/
 
-# Large/local data artifacts
-data/raw/
-data/processed/
-data/releases/
+# Local/generated tool artifacts
 artifacts/

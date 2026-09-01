@@ -1,11 +1,19 @@
 # SahalNLP architecture
 
-SahalNLP v1 separates production data processing from evaluation so that the repository stays understandable and benchmark answers cannot become hidden runtime knowledge.
-
-## Production flow
+SahalNLP is the **tools** layer of the Sahal ecosystem.
 
 ```text
-source text
+SahalNLP     = tools
+SahalDataset = data
+Sahal AI     = intelligence/product
+```
+
+The repository should contain reusable Python processing and evaluation code. Reviewed corpora, training/validation data, and frozen benchmark files belong in SahalDataset.
+
+## Processing flow
+
+```text
+external/source data
    ↓
 ingest
    ↓
@@ -17,10 +25,10 @@ dedup
    ↓
 quality decision
    ↓
-versioned usable records
+output records for review/storage in SahalDataset
 ```
 
-`evaluation` observes these stages but does not supply production rules or training examples to them.
+`evaluation` measures SahalNLP behavior against data supplied from SahalDataset. Production modules must not read frozen benchmark answers as runtime knowledge.
 
 ## Package responsibilities
 
@@ -28,7 +36,7 @@ versioned usable records
 Stable shared contracts: record identity, provenance, language status, quality tier, and other cross-module types. Keep this package small.
 
 ### `ingest`
-Convert an external source into SahalNLP records. Ingestion must preserve source identity and should preserve license/URL/date information when available.
+Convert an external source into SahalNLP records while preserving available source, license, URL, and date metadata.
 
 ### `cleaning`
 Repair technical text problems without pretending to judge Somali grammar. Cleaning should be reversible or auditable where practical, and uncertain destructive changes should be avoided.
@@ -37,13 +45,13 @@ Repair technical text problems without pretending to judge Somali grammar. Clean
 Estimate whether content is Somali, non-Somali, mixed, or uncertain. Mixed and uncertain are first-class outcomes.
 
 ### `dedup`
-Detect exact and later near duplicates. Deduplication must keep enough metadata to explain why a record was retained or linked to another.
+Detect exact and later near duplicates. Deduplication should preserve enough metadata to explain why records were linked or retained.
 
 ### `quality`
-Assign data-use tiers. Quality is not the same as grammatical correctness.
+Apply explicit quality and review policy. A tool may assign or recommend a tier, but reviewed dataset truth belongs in SahalDataset.
 
 ### `evaluation`
-Frozen benchmarks, scoring, and diagnostic helpers. Production modules must not read frozen benchmark answers as runtime knowledge.
+Benchmark runners, scoring, and diagnostics. Frozen benchmark files themselves live in SahalDataset and should be pinned to an exact revision for reproducibility.
 
 ## Dependency direction
 
@@ -61,14 +69,16 @@ production modules → evaluated by → evaluation
 
 ## Data policy
 
-Large downloaded corpora are not committed to Git. Small reviewed fixtures and frozen benchmark manifests may be tracked when their origin and purpose are documented.
+Do not commit corpora, training data, validation data, reviewed examples, or frozen benchmark answers to SahalNLP. Those belong in SahalDataset with provenance and licensing information.
+
+Small literal examples may still exist inside unit tests when they are necessary to test code behavior. Those are development/regression fixtures, not frozen unseen benchmark data.
 
 ## Growth rule
 
-Before adding a new top-level module, answer three questions:
+Before adding a new module, answer three questions:
 
-1. Does it solve a distinct SahalNLP responsibility?
+1. Is it a reusable NLP/data-processing **tool**?
 2. Can it live clearly inside an existing module instead?
-3. How will it be tested without contaminating frozen evaluation data?
+3. Can it be tested without moving dataset ownership into SahalNLP?
 
-This rule is meant to prevent the repository from becoming structurally confusing as it grows.
+This keeps SahalNLP focused and prevents the Sahal projects from becoming mixed together.
