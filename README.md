@@ -35,7 +35,7 @@ SahalNLP/
 ├── src/sahalnlp/
 │   ├── core/          # shared record contracts and enums
 │   ├── ingest/        # source ingestion
-│   ├── cleaning/      # text cleaning
+│   ├── cleaning/      # conservative text normalization + corruption reports
 │   ├── language/      # Somali/mixed/uncertain language analysis
 │   ├── dedup/         # duplicate control
 │   ├── quality/       # quality tiers and review policy
@@ -56,7 +56,7 @@ pytest
 
 ## Current status
 
-**Foundation stage.** Package boundaries, core data contracts, tests, and CI are being established before feature development begins.
+**Cleaning v1 implemented.** The foundation, core record contracts, conservative technical text cleaner, tests, and CI are in place. Cleaning v1 normalizes safe Unicode/whitespace representation issues and flags suspicious corruption rather than guessing a repair. See `docs/CLEANING_V1.md`.
 
 ## License
 
