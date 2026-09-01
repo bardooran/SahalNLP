@@ -1,0 +1,16 @@
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.venv/
+venv/
+dist/
+build/
+*.egg-info/
+.coverage
+htmlcov/
+
+# Large/local data artifacts
+data/raw/
+data/processed/
+data/releases/
+artifacts/
