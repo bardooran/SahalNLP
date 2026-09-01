@@ -21,6 +21,7 @@ _SOMALI_STRONG_MARKERS = frozenset(
         "waa",
         "ayaa",
         "waxaa",
+        "waxa",
         "waxaan",
         "wuxuu",
         "waxay",
@@ -33,6 +34,7 @@ _SOMALI_STRONG_MARKERS = frozenset(
         "yihiin",
         "haddii",
         "laakiin",
+        "laakin",
     }
 )
 
@@ -133,13 +135,16 @@ def analyze_text(text: str) -> LanguageAnalysis:
 
     somali_total = len(somali_strong) + len(somali_support)
     has_somali_base = len(somali_strong) >= 1 and somali_total >= 2
+    has_strong_somali_with_minor_english_noise = (
+        has_somali_base and somali_total >= 3 and len(english) == 1
+    )
 
     if has_somali_base and len(english) >= 2:
         status = LanguageStatus.MIXED
         reason = "substantial Somali and English evidence"
-    elif has_somali_base and not english:
+    elif has_somali_base and (not english or has_strong_somali_with_minor_english_noise):
         status = LanguageStatus.SOMALI
-        reason = "strong Somali evidence with no English counter-signal"
+        reason = "strong Somali evidence without substantial English counter-signal"
     elif len(english) >= 3 and somali_total == 0:
         status = LanguageStatus.NON_SOMALI
         reason = "strong English evidence with no Somali signal"

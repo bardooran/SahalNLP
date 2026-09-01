@@ -19,6 +19,36 @@ def test_another_clear_somali_example() -> None:
     assert result.somali_support_markers == ("ka",)
 
 
+def test_waxa_split_form_provides_strong_somali_evidence() -> None:
+    result = analyze_text("waxa uu ku")
+
+    assert result.status is LanguageStatus.SOMALI
+    assert result.somali_strong_markers == ("waxa",)
+    assert result.somali_support_markers == ("ku",)
+
+
+def test_laakin_variant_provides_strong_somali_evidence() -> None:
+    result = analyze_text("laakin oo")
+
+    assert result.status is LanguageStatus.SOMALI
+    assert result.somali_strong_markers == ("laakin",)
+    assert result.somali_support_markers == ("oo",)
+
+
+def test_one_english_marker_does_not_veto_three_somali_signals() -> None:
+    result = analyze_text("ayaa oo iyo The")
+
+    assert result.status is LanguageStatus.SOMALI
+    assert result.english_markers == ("the",)
+
+
+def test_two_english_markers_still_make_substantial_mixed_evidence() -> None:
+    result = analyze_text("ayaa oo iyo the and")
+
+    assert result.status is LanguageStatus.MIXED
+    assert result.english_markers == ("the", "and")
+
+
 def test_clear_english_requires_several_distinct_signals() -> None:
     result = analyze_text("The children are playing with their friends and teachers.")
 
