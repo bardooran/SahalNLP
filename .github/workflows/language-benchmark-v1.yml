@@ -1,0 +1,30 @@
+name: Language benchmark v1
+
+on:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  benchmark:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out SahalNLP
+        uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      - name: Install SahalNLP
+        run: python -m pip install -e ".[dev]"
+      - name: Download frozen SahalDataset benchmark
+        run: |
+          curl --fail --location --retry 3 \
+            --output /tmp/language-benchmark-v1.jsonl \
+            https://raw.githubusercontent.com/bardooran/Sahaldataset/a62ebcc5062b8dd6b186503adc5dbcb330e47a2e/evaluation/language_id_v1/benchmark.jsonl
+          echo "31ca351801e9fbbebc467b9fc2f8f6515f2fd5e3fbe44dd8f733391d75b61e6c  /tmp/language-benchmark-v1.jsonl" | sha256sum --check --strict
+      - name: Measure frozen benchmark
+        run: python -m sahalnlp.evaluation.language_benchmark /tmp/language-benchmark-v1.jsonl
