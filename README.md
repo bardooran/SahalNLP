@@ -1,32 +1,39 @@
 # SahalNLP
 
-**Somali-first NLP infrastructure for clean, auditable, linguistically useful language data.**
+**Somali-first NLP tools for building clean, auditable, linguistically useful data.**
 
-SahalNLP is an original project for building trustworthy Somali NLP foundations. The first release focuses on the data layer: ingesting text, cleaning it without destroying useful Somali information, classifying language status, controlling duplicates, assigning quality tiers, and evaluating every stage with frozen tests.
+SahalNLP is the **tools** project in the Sahal ecosystem. It contains Python code for processing and evaluating Somali language data. Reviewed corpora, training data, validation data, and frozen evaluation data belong in **SahalDataset**, not in this repository.
+
+## Sahal ecosystem map
+
+- **SahalNLP = tools**
+- **SahalDataset = data**
+- **Sahal AI = intelligence/product**
 
 ## v1 scope
 
 SahalNLP v1 is intentionally small:
 
-1. **Ingest** — accept Somali text with source metadata.
-2. **Cleaning** — normalize technical noise while preserving linguistic content.
+1. **Ingest** — accept text with source metadata.
+2. **Cleaning** — normalize technical noise while preserving useful Somali linguistic content.
 3. **Language status** — represent `somali`, `non_somali`, `mixed`, and `uncertain` instead of forcing every record into a yes/no decision.
-4. **Duplicate control** — exact and near-duplicate processing.
-5. **Quality & provenance** — rank usable data as Gold, Silver, Bronze, or Quarantine while retaining where it came from.
-6. **Evaluation** — keep frozen evaluation data separate from development data and regression tests.
+4. **Duplicate control** — exact and later near-duplicate processing.
+5. **Quality tooling** — apply explicit quality/review policy without treating a guess as reviewed fact.
+6. **Evaluation tooling** — score frozen data supplied from SahalDataset without embedding benchmark answers in production code.
 
 ## Not in v1
 
-Tokenizer training, POS tagging, morphology, syntax, web crawling, OCR, translation, NER, and LLM training are later modules. They should only be added after the data foundation is stable.
+Tokenizer training, POS tagging, morphology, syntax, web crawling, OCR, translation, NER, and LLM training are later stages. They should only be added when the current foundation is stable and there is a clear need.
 
 ## Core principles
 
-- **Somali-first:** decisions should protect Somali linguistic information, not only generic text cleanliness.
+- **Somali-first:** protect Somali linguistic information, not only generic text cleanliness.
 - **Uncertainty is data:** ambiguous records remain ambiguous rather than being guessed.
-- **Provenance by default:** useful records should be traceable to their source and license information when known.
-- **Evaluation isolation:** benchmarks must not quietly become training inputs.
+- **Provenance by default:** processing should preserve available source and licensing metadata.
+- **Project separation:** SahalNLP contains tools; SahalDataset contains reviewed and frozen data.
+- **Evaluation isolation:** frozen benchmark answers must never become hidden runtime knowledge.
 - **Small modules:** new capabilities get clear homes instead of growing one large flat folder.
-- **Original implementation:** SahalNLP is designed and implemented independently; external projects may inform research questions, but their code, documentation, and project structure are not copied.
+- **Original implementation:** external projects may inform research questions, but their code, documentation, and project structure are not copied.
 
 ## Repository layout
 
@@ -34,18 +41,22 @@ Tokenizer training, POS tagging, morphology, syntax, web crawling, OCR, translat
 SahalNLP/
 ├── src/sahalnlp/
 │   ├── core/          # shared record contracts and enums
-│   ├── ingest/        # source ingestion
+│   ├── ingest/        # source ingestion tools
 │   ├── cleaning/      # conservative text normalization + corruption reports
 │   ├── language/      # conservative Somali/mixed/non-Somali/uncertain analysis
-│   ├── dedup/         # duplicate control
-│   ├── quality/       # quality tiers and review policy
-│   └── evaluation/    # evaluation helpers; no production learning
-├── tests/             # regression and behavior tests by area
-├── data/              # small reviewed fixtures only; not bulk corpora
-├── benchmarks/        # frozen evaluation manifests and documentation
-├── docs/              # architecture and project rules
-└── .github/workflows/ # automated checks
+│   ├── dedup/         # duplicate-control tools
+│   ├── quality/       # quality/review policy tools
+│   └── evaluation/    # evaluation runners and scoring helpers
+├── tests/             # development and regression tests by area
+├── docs/              # architecture, rules, and implementation notes
+└── .github/workflows/ # automated tests and benchmark runners
 ```
+
+## Data boundary
+
+SahalNLP may read local files during development or CI, but dataset content is not owned here. Reviewed corpora, training/validation splits, and frozen benchmark files live in **SahalDataset** with provenance and licensing information.
+
+Evaluation workflows should pin the exact SahalDataset revision and verify downloaded benchmark files when practical. This keeps development tests separate from frozen/unseen evaluation data.
 
 ## Development
 
@@ -56,9 +67,9 @@ pytest
 
 ## Current status
 
-**Language Analysis v1 implemented.** The foundation, Cleaning v1, and a conservative auditable language-status analyzer are in place. The analyzer can return `somali`, `non_somali`, `mixed`, or `uncertain`, and it leaves weak or unsupported cases uncertain rather than guessing. See `docs/CLEANING_V1.md` and `docs/LANGUAGE_V1.md`.
+**Language Analysis v1.1 is implemented.** The foundation, Cleaning v1, conservative language-status analyzer, and a frozen-benchmark runner are in place. The benchmark runner downloads frozen evaluation data from SahalDataset; the benchmark data itself is not stored in SahalNLP.
 
-The language unit tests are development/regression tests, not an unseen benchmark. A separate frozen language benchmark is still required before making general performance claims.
+Development/regression tests are not unseen benchmarks. Comparative performance claims require a fair frozen evaluation with the same task, data, scoring rules, and reproducible outputs.
 
 ## License
 
