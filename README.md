@@ -36,7 +36,7 @@ SahalNLP/
 │   ├── core/          # shared record contracts and enums
 │   ├── ingest/        # source ingestion
 │   ├── cleaning/      # conservative text normalization + corruption reports
-│   ├── language/      # Somali/mixed/uncertain language analysis
+│   ├── language/      # conservative Somali/mixed/non-Somali/uncertain analysis
 │   ├── dedup/         # duplicate control
 │   ├── quality/       # quality tiers and review policy
 │   └── evaluation/    # evaluation helpers; no production learning
@@ -56,7 +56,9 @@ pytest
 
 ## Current status
 
-**Cleaning v1 implemented.** The foundation, core record contracts, conservative technical text cleaner, tests, and CI are in place. Cleaning v1 normalizes safe Unicode/whitespace representation issues and flags suspicious corruption rather than guessing a repair. See `docs/CLEANING_V1.md`.
+**Language Analysis v1 implemented.** The foundation, Cleaning v1, and a conservative auditable language-status analyzer are in place. The analyzer can return `somali`, `non_somali`, `mixed`, or `uncertain`, and it leaves weak or unsupported cases uncertain rather than guessing. See `docs/CLEANING_V1.md` and `docs/LANGUAGE_V1.md`.
+
+The language unit tests are development/regression tests, not an unseen benchmark. A separate frozen language benchmark is still required before making general performance claims.
 
 ## License
 
